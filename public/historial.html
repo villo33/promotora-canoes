@@ -104,33 +104,16 @@ function inicio(){
 }
 
 
-// FORMATEAR FECHA (corregido)
+// formatear fecha segura
 function formatearFecha(fechaDB){
 
   if(!fechaDB) return "-";
 
-  // convertir a texto por seguridad
-  fechaDB = String(fechaDB);
+  const soloFecha = fechaDB.substring(0,10);
 
-  // caso: 2026-06-21
-  if(fechaDB.includes("-")){
+  const partes = soloFecha.split("-");
 
-    const soloFecha = fechaDB.substring(0,10);
-
-    const partes = soloFecha.split("-");
-
-    if(partes.length === 3){
-      return `${partes[2]}/${partes[1]}/${partes[0]}`;
-    }
-  }
-
-  // caso: ya viene 21/06/2026
-  if(fechaDB.includes("/")){
-    return fechaDB;
-  }
-
-  // fallback
-  return fechaDB;
+  return `${partes[2]}/${partes[1]}/${partes[0]}`;
 }
 
 
@@ -199,7 +182,7 @@ function filtrar(){
   if(fecha){
 
     filtrado = filtrado.filter(d =>
-      String(d.fecha).substring(0,10) === fecha
+      d.fecha.substring(0,10) === fecha
     );
 
   }
@@ -235,7 +218,7 @@ function renderTabla(data){
 
   data.forEach(r => {
 
-    let fechaActual = String(r.fecha).substring(0,10);
+    let fechaActual = r.fecha.substring(0,10);
 
 
     // si cambia fecha → agregar linea separadora
