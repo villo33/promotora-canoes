@@ -1,59 +1,53 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Promotora Canoes</title>
 <link rel="stylesheet" href="style.css">
+
 </head>
 
 <body>
 
-<div class="background">
+<div class="container">
 
-  <div class="panel">
+<h1>🏗 PROMOTORA CANOES</h1>
 
-    <header class="topbar">
-      <h1>🏗 Promotora Canoes</h1>
-      <p>Control de personal de obra</p>
-    </header>
+<h2>Control Personal de Ingreso</h2>
 
-    <div class="grid">
+<div class="menu">
 
-      <div class="card" onclick="ir('contratistas.html')">
-        <div class="icon">📁</div>
-        <h2>Contratistas</h2>
-        <p>Gestión de empresas de obra</p>
-      </div>
+<div class="card" onclick="ir('contratistas.html')">
+<h3>📁 Contratistas</h3>
+<p>Registrar empresas contratistas</p>
+</div>
 
-      <div class="card" onclick="ir('trabajadores.html')">
-        <div class="icon">👷</div>
-        <h2>Trabajadores</h2>
-        <p>Registro de personal</p>
-      </div>
+<div class="card" onclick="ir('trabajadores.html')">
+<h3>👷 Trabajadores</h3>
+<p>Registrar personal</p>
+</div>
 
-      <div class="card" onclick="ir('historial.html')">
-        <div class="icon">📊</div>
-        <h2>Historial</h2>
-        <p>Asistencias anteriores</p>
-      </div>
+<div class="card" onclick="ir('historial.html')">
+<h3>📊 Historial</h3>
+<p>Ver registros anteriores</p>
+</div>
 
-      <div class="card" onclick="ir('planilla.html')">
-        <div class="icon">📋</div>
-        <h2>Planilla diaria</h2>
-        <p>Control rápido de asistencia</p>
-      </div>
+<button onclick="window.location.href='historial.html'">
+📊 Historial
+</button>
 
-    </div>
 
-  </div>
+</div>
 
 </div>
 
 <script>
-function ir(url){
-  window.location.href = url;
+
+function ir(pagina){
+  window.location.href = pagina;
 }
+
 </script>
 
 </body>
