@@ -40,12 +40,9 @@ select,input{
   font-weight:bold;
 }
 
-.fecha-separador{
-  background:#1e293b;
-  color:white;
-  font-weight:bold;
-  text-align:center;
-  font-size:18px;
+/* linea separadora */
+.separador-fecha td{
+  border-top:4px solid #d1d5db;
 }
 
 </style>
@@ -107,16 +104,16 @@ function inicio(){
 }
 
 
-// formato fecha bonito
+// formatear fecha segura
 function formatearFecha(fechaDB){
 
-  const fecha = new Date(fechaDB);
+  if(!fechaDB) return "-";
 
-  const dia = String(fecha.getDate()).padStart(2,'0');
-  const mes = String(fecha.getMonth() + 1).padStart(2,'0');
-  const anio = fecha.getFullYear();
+  const soloFecha = fechaDB.substring(0,10);
 
-  return `${dia}/${mes}/${anio}`;
+  const partes = soloFecha.split("-");
+
+  return `${partes[2]}/${partes[1]}/${partes[0]}`;
 }
 
 
@@ -197,7 +194,7 @@ function filtrar(){
 
 
 
-// pintar tabla agrupando por fecha
+// pintar tabla
 function renderTabla(data){
 
   let html = '';
@@ -219,36 +216,24 @@ function renderTabla(data){
 
   let fechaAnterior = "";
 
-
   data.forEach(r => {
 
     let fechaActual = r.fecha.substring(0,10);
 
 
-    // SI CAMBIA FECHA → crear separador
-    if(fechaActual !== fechaAnterior){
+    // si cambia fecha → agregar linea separadora
+    let clase = "";
 
-      html += `
-
-      <tr class="fecha-separador">
-        <td colspan="7">
-
-        📅 ${formatearFecha(fechaActual)}
-
-        ━━━━━━━━━━━━━━━━━━━━━
-
-        </td>
-      </tr>
-
-      `;
-
-      fechaAnterior = fechaActual;
+    if(fechaAnterior && fechaActual !== fechaAnterior){
+      clase = "separador-fecha";
     }
+
+    fechaAnterior = fechaActual;
 
 
     html += `
 
-<tr>
+<tr class="${clase}">
 
 <td>${formatearFecha(r.fecha)}</td>
 
