@@ -8,10 +8,11 @@
 
 <style>
 
-select{
+select,input{
   padding:10px;
   width:250px;
   border-radius:8px;
+  border:1px solid #ccc;
 }
 
 .estado-presente{
@@ -21,6 +22,21 @@ select{
 
 .estado-ausente{
   color:red;
+  font-weight:bold;
+}
+
+.estado-permiso{
+  color:orange;
+  font-weight:bold;
+}
+
+.estado-incapacidad{
+  color:purple;
+  font-weight:bold;
+}
+
+.estado-vacaciones{
+  color:blue;
   font-weight:bold;
 }
 
@@ -53,14 +69,13 @@ select{
 <thead>
 
 <tr>
-
 <th>Fecha</th>
 <th>Contratista</th>
 <th>Trabajador</th>
 <th>Cédula</th>
 <th>Cargo</th>
 <th>Estado</th>
-
+<th>Observación</th>
 </tr>
 
 </thead>
@@ -84,6 +99,19 @@ function inicio(){
 }
 
 
+// formatear fecha bonita
+function formatearFecha(fechaDB){
+
+  const fecha = new Date(fechaDB);
+
+  const dia = String(fecha.getDate()).padStart(2,'0');
+  const mes = String(fecha.getMonth() + 1).padStart(2,'0');
+  const anio = fecha.getFullYear();
+
+  return `${dia}/${mes}/${anio}`;
+}
+
+
 // cargar contratistas
 async function cargarContratistas(){
 
@@ -96,7 +124,7 @@ async function cargarContratistas(){
     </option>
   `;
 
-  data.forEach(c=>{
+  data.forEach(c => {
 
     html += `
       <option value="${c.nombre}">
@@ -111,11 +139,10 @@ async function cargarContratistas(){
 
 
 
-// cargar historial completo
+// cargar historial
 async function cargar(){
 
   const res = await fetch(`${API}/asistencia`);
-
   const data = await res.json();
 
   datosGlobal = data;
@@ -137,6 +164,8 @@ function filtrar(){
 
   let filtrado = datosGlobal;
 
+
+  // filtrar contratista
   if(contratista){
 
     filtrado = filtrado.filter(d =>
@@ -145,10 +174,12 @@ function filtrar(){
 
   }
 
+
+  // filtrar fecha
   if(fecha){
 
     filtrado = filtrado.filter(d =>
-      d.fecha === fecha
+      d.fecha.substring(0,10) === fecha
     );
 
   }
@@ -159,7 +190,7 @@ function filtrar(){
 
 
 
-// renderizar tabla
+// pintar tabla
 function renderTabla(data){
 
   let html = '';
@@ -168,7 +199,7 @@ function renderTabla(data){
 
     html = `
       <tr>
-        <td colspan="6">
+        <td colspan="7">
           No hay registros
         </td>
       </tr>
@@ -176,37 +207,40 @@ function renderTabla(data){
 
   }
 
-  data.forEach(r=>{
+
+  data.forEach(r => {
 
     html += `
 
-    <tr>
+<tr>
 
-      <td>${r.fecha}</td>
+<td>${r.fecha}</td>
 
-      <td>${r.contratista}</td>
+<td>${r.contratista}</td>
 
-      <td>${r.nombre}</td>
+<td>${r.nombre}</td>
 
-      <td>${r.cedula}</td>
+<td>${r.cedula}</td>
 
-      <td>${r.cargo}</td>
+<td>${r.cargo}</td>
 
-      <td class="${
-        r.estado === 'presente'
-        ? 'estado-presente'
-        : 'estado-ausente'
-      }">
+<td class="${
+  r.estado === 'presente'
+  ? 'estado-presente'
+  : 'estado-ausente'
+}">
+${r.estado}
+</td>
 
-      ${r.estado}
+<td>
+${r.observacion || '-'}
+</td>
 
-      </td>
-
-    </tr>
-
-    `;
+</tr>
+`;
 
   });
+
 
   document.getElementById("tabla").innerHTML = html;
 

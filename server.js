@@ -318,7 +318,6 @@ app.post('/control-diario', async (req, res) => {
 });
 
 
-
 // historial asistencia
 app.get('/asistencia', async (req, res) => {
 
@@ -329,7 +328,9 @@ app.get('/asistencia', async (req, res) => {
       SELECT
 
       asistencia.id,
-      asistencia.fecha,
+
+      TO_CHAR(asistencia.fecha, 'DD/MM/YYYY') AS fecha,
+
       asistencia.estado,
       asistencia.observacion,
 
@@ -347,7 +348,8 @@ app.get('/asistencia', async (req, res) => {
       JOIN contratistas
       ON trabajadores.contratista_id = contratistas.id
 
-      ORDER BY asistencia.fecha DESC
+      ORDER BY asistencia.fecha DESC,
+               asistencia.id DESC
 
     `);
 
