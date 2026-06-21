@@ -90,3 +90,27 @@ button{
   background:#007BFF;
   color:white;
 }
+
+.container{
+  width:90%;
+  max-width:1100px;
+  margin:auto;
+  padding:20px;
+}
+
+.btn-pdf{
+  background:#007BFF;
+  color:white;
+  padding:10px 15px;
+  border-radius:8px;
+  border:none;
+  cursor:pointer;
+  font-weight:bold;
+  display:inline-block;
+}
+
+.top-bar,
+.container{
+  position:relative;
+  z-index:1;
+}
