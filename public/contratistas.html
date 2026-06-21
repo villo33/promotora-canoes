@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+
+<meta charset="UTF-8">
+<title>Contratistas</title>
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<div class="top-bar">
+  <button class="btn-inicio" onclick="inicio()">🏠 Inicio</button>
+</div>
+
+<div class="container">
+
+  <h2>📁 Gestión Contratistas</h2>
+
+  <div class="form">
+
+    <input id="nombre" placeholder="Nombre empresa">
+
+    <input id="responsable" placeholder="Responsable">
+
+    <input id="telefono" placeholder="Teléfono">
+
+    <button class="btn-guardar" onclick="guardar()">
+      Guardar
+    </button>
+
+  </div>
+
+  <table>
+
+    <thead>
+
+      <tr>
+        <th>Empresa</th>
+        <th>Responsable</th>
+        <th>Teléfono</th>
+        <th>Acción</th>
+      </tr>
+
+    </thead>
+
+    <tbody id="tabla"></tbody>
+
+  </table>
+
+</div>
+
+
+<script>
+
+const API = window.location.origin;
+
+
+// volver inicio
+function inicio(){
+  window.location.href = "/";
+}
+
+
+// guardar contratista
+async function guardar(){
+
+  const nombre = document.getElementById("nombre").value;
+  const responsable = document.getElementById("responsable").value;
+  const telefono = document.getElementById("telefono").value;
+
+  if(!nombre || !responsable || !telefono){
+    alert("Completa todos los campos");
+    return;
+  }
+
+  await fetch(`${API}/contratistas`, {
+
+    method:'POST',
+
+    headers:{
+      'Content-Type':'application/json'
+    },
+
+    body: JSON.stringify({
+      nombre,
+      responsable,
+      telefono
+    })
+
+  });
+
+  limpiar();
+  cargar();
+}
+
+
+// eliminar
+async function eliminar(id){
+
+  if(!confirm("Eliminar contratista?")) return;
+
+  await fetch(`${API}/contratistas/` + id, {
+    method:'DELETE'
+  });
+
+  cargar();
+}
+
+
+// limpiar formulario
+function limpiar(){
+
+  document.getElementById("nombre").value = "";
+  document.getElementById("responsable").value = "";
+  document.getElementById("telefono").value = "";
+
+}
+
+
+// cargar tabla
+async function cargar(){
+
+  const res = await fetch(`${API}/contratistas`);
+
+  const data = await res.json();
+
+  let html = '';
+
+  if(data.length === 0){
+    html = `
+      <tr>
+        <td colspan="4">No hay contratistas</td>
+      </tr>
+    `;
+  }
+
+  data.forEach(c => {
+
+    html += `
+      <tr>
+
+        <td>${c.nombre}</td>
+
+        <td>${c.responsable}</td>
+
+        <td>${c.telefono}</td>
+
+        <td>
+
+          <button class="btn-eliminar"
+          onclick="eliminar(${c.id})">
+
+          ❌
+
+          </button>
+
+        </td>
+
+      </tr>
+    `;
+  });
+
+  document.getElementById("tabla").innerHTML = html;
+
+}
+
+
+// iniciar
+cargar();
+
+</script>
+
+</body>
+</html>

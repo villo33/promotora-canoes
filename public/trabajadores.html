@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+
+<meta charset="UTF-8">
+<title>Trabajadores</title>
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<div class="top-bar">
+  <button class="btn-inicio" onclick="inicio()">🏠 Inicio</button>
+</div>
+
+<div class="container">
+
+<h2>👷 Gestión Trabajadores</h2>
+
+<div class="form">
+
+<input id="nombre" placeholder="Nombre completo">
+
+<input id="cedula" placeholder="Cédula">
+
+<input id="telefono" placeholder="Teléfono">
+
+<input id="cargo" placeholder="Cargo">
+
+<select id="contratista">
+<option value="">Seleccionar contratista</option>
+</select>
+
+<button class="btn-guardar" onclick="guardar()">
+Guardar
+</button>
+
+</div>
+
+
+<table>
+
+<thead>
+<tr>
+
+<th>Nombre</th>
+<th>Cédula</th>
+<th>Cargo</th>
+<th>Contratista</th>
+<th>Acción</th>
+
+</tr>
+</thead>
+
+<tbody id="tabla"></tbody>
+
+</table>
+
+</div>
+
+
+<script>
+
+const API = window.location.origin;
+
+
+// volver inicio
+function inicio(){
+  window.location.href = "/";
+}
+
+
+// cargar contratistas
+async function cargarContratistas(){
+
+  const res = await fetch(`${API}/contratistas`);
+
+  const data = await res.json();
+
+  let html =
+  `<option value="">Seleccionar contratista</option>`;
+
+  data.forEach(c => {
+
+    html += `
+      <option value="${c.id}">
+        ${c.nombre}
+      </option>
+    `;
+
+  });
+
+  document.getElementById("contratista").innerHTML = html;
+}
+
+
+
+// guardar trabajador
+async function guardar(){
+
+  const nombre = document.getElementById("nombre").value;
+  const cedula = document.getElementById("cedula").value;
+  const telefono = document.getElementById("telefono").value;
+  const cargo = document.getElementById("cargo").value;
+  const contratista_id = document.getElementById("contratista").value;
+
+  if(!nombre || !cedula || !telefono || !cargo || !contratista_id){
+
+    alert("Completa todos los datos");
+    return;
+
+  }
+
+  await fetch(`${API}/trabajadores`, {
+
+    method:'POST',
+
+    headers:{
+      'Content-Type':'application/json'
+    },
+
+    body: JSON.stringify({
+      nombre,
+      cedula,
+      telefono,
+      cargo,
+      contratista_id
+    })
+
+  });
+
+  limpiar();
+  cargar();
+
+}
+
+
+// eliminar
+async function eliminar(id){
+
+  if(!confirm("Eliminar trabajador?")) return;
+
+  await fetch(`${API}/trabajadores/` + id, {
+    method:'DELETE'
+  });
+
+  cargar();
+
+}
+
+
+// limpiar
+function limpiar(){
+
+  document.getElementById("nombre").value = "";
+  document.getElementById("cedula").value = "";
+  document.getElementById("telefono").value = "";
+  document.getElementById("cargo").value = "";
+  document.getElementById("contratista").value = "";
+
+}
+
+
+// cargar trabajadores
+async function cargar(){
+
+  const res = await fetch(`${API}/trabajadores`);
+
+  const data = await res.json();
+
+  let html = '';
+
+  if(data.length === 0){
+
+    html = `
+    <tr>
+      <td colspan="5">No hay trabajadores</td>
+    </tr>
+    `;
+
+  }
+
+  data.forEach(t => {
+
+    html += `
+
+      <tr>
+
+      <td>${t.nombre}</td>
+
+      <td>${t.cedula}</td>
+
+      <td>${t.cargo}</td>
+
+      <td>${t.contratista}</td>
+
+      <td>
+
+      <button
+      class="btn-eliminar"
+      onclick="eliminar(${t.id})">
+
+      ❌
+
+      </button>
+
+      </td>
+
+      </tr>
+
+    `;
+
+  });
+
+  document.getElementById("tabla").innerHTML = html;
+
+}
+
+
+// iniciar
+cargarContratistas();
+cargar();
+
+</script>
+
+</body>
+</html>
