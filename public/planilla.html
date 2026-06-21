@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+
+<meta charset="UTF-8">
+<title>Planilla Diaria</title>
+<link rel="stylesheet" href="style.css">
+
+<style>
+
+select, input{
+  padding:10px;
+  border-radius:8px;
+  border:1px solid #ccc;
+  margin:5px;
+}
+
+table{
+  width:100%;
+  border-collapse: collapse;
+  margin-top:20px;
+}
+
+th{
+  background:#007BFF;
+  color:white;
+}
+
+td, th{
+  border:1px solid #ccc;
+  padding:10px;
+  text-align:center;
+}
+
+.btn-guardar{
+  background:#28a745;
+  color:white;
+  padding:10px 20px;
+  border:none;
+  cursor:pointer;
+  border-radius:8px;
+}
+
+.estado{
+  width:150px;
+}
+
+.obs{
+  width:220px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="top-bar">
+  <button class="btn-inicio" onclick="inicio()">🏠 Inicio</button>
+</div>
+
+<div class="container">
+
+<h2>📋 Planilla Diario de Personal</h2>
+
+<div class="form">
+
+<select id="contratista" onchange="cargarTrabajadores()">
+<option value="">Seleccionar contratista</option>
+</select>
+
+<input type="date" id="fecha">
+
+</div>
+
+<table>
+
+<thead>
+<tr>
+<th>Trabajador</th>
+<th>Cédula</th>
+<th>Cargo</th>
+<th>Estado</th>
+<th>Observación</th>
+</tr>
+</thead>
+
+<tbody id="tabla"></tbody>
+
+</table>
+
+<br>
+
+<button class="btn-guardar" onclick="guardar()">
+💾 Guardar Planilla
+</button>
+
+</div>
+
+<script>
+
+const API = window.location.origin;
+let trabajadores = [];
+
+
+// volver inicio
+function inicio(){
+  window.location.href="/";
+}
+
+
+// cargar contratistas
+async function cargarContratistas(){
+
+  const res = await fetch(`${API}/contratistas`);
+  const data = await res.json();
+
+  let html = `
+  <option value="">
+  Seleccionar contratista
+  </option>
+  `;
+
+  data.forEach(c => {
+
+    html += `
+    <option value="${c.id}">
+      ${c.nombre}
+    </option>
+    `;
+
+  });
+
+  document.getElementById("contratista").innerHTML = html;
+}
+
+
+// cargar trabajadores del contratista
+async function cargarTrabajadores(){
+
+  const contratista =
+  document.getElementById("contratista").value;
+
+  if(!contratista) return;
+
+  const res = await fetch(
+    `${API}/trabajadores/${contratista}`
+  );
+
+  const data = await res.json();
+
+  trabajadores = data;
+
+  let html = '';
+
+  data.forEach(t => {
+
+    html += `
+
+    <tr>
+
+      <td>${t.nombre}</td>
+
+      <td>${t.cedula}</td>
+
+      <td>${t.cargo}</td>
+
+      <td>
+
+      <select
+      class="estado"
+      id="estado_${t.id}">
+
+        <option value="presente">
+          Presente
+        </option>
+
+        <option value="ausente">
+          Ausente
+        </option>
+
+        <option value="incapacidad">
+          Incapacidad
+        </option>
+
+        <option value="permiso">
+          Permiso
+        </option>
+
+        <option value="vacaciones">
+          Vacaciones
+        </option>
+
+      </select>
+
+      </td>
+
+      <td>
+
+      <input
+      class="obs"
+      id="obs_${t.id}"
+      placeholder="Observación">
+
+      </td>
+
+    </tr>
+
+    `;
+
+  });
+
+  document.getElementById("tabla").innerHTML = html;
+}
+
+
+
+// guardar planilla
+async function guardar(){
+
+  const fecha =
+  document.getElementById("fecha").value;
+
+  if(!fecha){
+
+    alert("Selecciona una fecha");
+    return;
+
+  }
+
+  let lista = [];
+
+  trabajadores.forEach(t => {
+
+    lista.push({
+
+      trabajador_id: t.id,
+
+      fecha: fecha,
+
+      estado:
+      document.getElementById(
+      `estado_${t.id}`
+      ).value,
+
+      observacion:
+      document.getElementById(
+      `obs_${t.id}`
+      ).value
+
+    });
+
+  });
+
+
+  const res = await fetch(
+    `${API}/control-diario`,
+    {
+
+      method:'POST',
+
+      headers:{
+        'Content-Type':'application/json'
+      },
+
+      body: JSON.stringify(lista)
+
+    }
+  );
+
+
+  const msg = await res.text();
+
+  alert(msg);
+
+}
+
+
+
+cargarContratistas();
+
+</script>
+
+</body>
+</html>
