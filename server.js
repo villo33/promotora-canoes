@@ -97,6 +97,47 @@ app.delete('/contratistas/:id', async (req, res) => {
 
 });
 
+// editar contratista
+app.put('/contratistas/:id', async (req,res)=>{
+
+  const {
+    nombre,
+    responsable,
+    telefono
+  } = req.body;
+
+  try{
+
+    await db.query(
+
+      `UPDATE contratistas
+
+       SET nombre=$1,
+           responsable=$2,
+           telefono=$3
+
+       WHERE id=$4`,
+
+      [
+        nombre,
+        responsable,
+        telefono,
+        req.params.id
+      ]
+
+    );
+
+    res.send("Actualizado");
+
+  }catch(err){
+
+    console.error(err);
+    res.status(500).send(err.message);
+
+  }
+
+});
+
 
 
 // ===================================================
@@ -226,6 +267,53 @@ app.delete('/trabajadores/:id', async (req, res) => {
 
 });
 
+// editar trabajador
+app.put('/trabajadores', async (req, res) => {
+
+  const {
+    id,
+    nombre,
+    cedula,
+    telefono,
+    cargo,
+    contratista_id
+  } = req.body;
+
+  try {
+
+    await db.query(
+
+      `UPDATE trabajadores
+
+       SET nombre=$1,
+           cedula=$2,
+           telefono=$3,
+           cargo=$4,
+           contratista_id=$5
+
+       WHERE id=$6`,
+
+      [
+        nombre,
+        cedula,
+        telefono,
+        cargo,
+        contratista_id,
+        id
+      ]
+
+    );
+
+    res.send("Trabajador actualizado");
+
+  } catch (err) {
+
+    console.error(err);
+    res.status(500).send(err.message);
+
+  }
+
+});
 
 
 // ===================================================

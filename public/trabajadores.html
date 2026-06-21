@@ -32,7 +32,7 @@
 <option value="">Seleccionar contratista</option>
 </select>
 
-<button class="btn-guardar" onclick="guardar()">
+<button id="btnGuardar" class="btn-guardar" onclick="guardar()">
 Guardar
 </button>
 
@@ -64,6 +64,9 @@ Guardar
 
 const API = window.location.origin;
 
+// guarda el id cuando estamos editando
+let editandoId = null;
+
 
 // volver inicio
 function inicio(){
@@ -75,7 +78,6 @@ function inicio(){
 async function cargarContratistas(){
 
   const res = await fetch(`${API}/contratistas`);
-
   const data = await res.json();
 
   let html =
@@ -96,7 +98,7 @@ async function cargarContratistas(){
 
 
 
-// guardar trabajador
+// guardar o actualizar trabajador
 async function guardar(){
 
   const nombre = document.getElementById("nombre").value;
@@ -112,28 +114,84 @@ async function guardar(){
 
   }
 
-  await fetch(`${API}/trabajadores`, {
+  // EDITAR
+  if(editandoId){
 
-    method:'POST',
+    await fetch(`${API}/trabajadores`, {
 
-    headers:{
-      'Content-Type':'application/json'
-    },
+      method:'PUT',
 
-    body: JSON.stringify({
-      nombre,
-      cedula,
-      telefono,
-      cargo,
-      contratista_id
-    })
+      headers:{
+        'Content-Type':'application/json'
+      },
 
-  });
+      body: JSON.stringify({
+
+        id: editandoId,
+        nombre,
+        cedula,
+        telefono,
+        cargo,
+        contratista_id
+
+      })
+
+    });
+
+    alert("Trabajador actualizado");
+
+  }
+
+  // NUEVO
+  else{
+
+    await fetch(`${API}/trabajadores`, {
+
+      method:'POST',
+
+      headers:{
+        'Content-Type':'application/json'
+      },
+
+      body: JSON.stringify({
+
+        nombre,
+        cedula,
+        telefono,
+        cargo,
+        contratista_id
+
+      })
+
+    });
+
+    alert("Trabajador guardado");
+
+  }
 
   limpiar();
   cargar();
 
 }
+
+
+
+// editar trabajador
+function editar(t){
+
+  editandoId = t.id;
+
+  document.getElementById("nombre").value = t.nombre;
+  document.getElementById("cedula").value = t.cedula;
+  document.getElementById("telefono").value = t.telefono;
+  document.getElementById("cargo").value = t.cargo;
+  document.getElementById("contratista").value = t.contratista_id;
+
+  document.getElementById("btnGuardar").innerText =
+  "Actualizar";
+
+}
+
 
 
 // eliminar
@@ -150,8 +208,11 @@ async function eliminar(id){
 }
 
 
+
 // limpiar
 function limpiar(){
+
+  editandoId = null;
 
   document.getElementById("nombre").value = "";
   document.getElementById("cedula").value = "";
@@ -159,14 +220,17 @@ function limpiar(){
   document.getElementById("cargo").value = "";
   document.getElementById("contratista").value = "";
 
+  document.getElementById("btnGuardar").innerText =
+  "Guardar";
+
 }
+
 
 
 // cargar trabajadores
 async function cargar(){
 
   const res = await fetch(`${API}/trabajadores`);
-
   const data = await res.json();
 
   let html = '';
@@ -196,6 +260,10 @@ async function cargar(){
       <td>${t.contratista}</td>
 
       <td>
+
+      <button onclick='editar(${JSON.stringify(t)})'>
+      ✏
+      </button>
 
       <button
       class="btn-eliminar"

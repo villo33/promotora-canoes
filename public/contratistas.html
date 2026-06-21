@@ -56,6 +56,9 @@
 
 const API = window.location.origin;
 
+// guarda id cuando editas
+let editandoId = null;
+
 
 // volver inicio
 function inicio(){
@@ -63,37 +66,95 @@ function inicio(){
 }
 
 
-// guardar contratista
+// guardar o editar
 async function guardar(){
 
-  const nombre = document.getElementById("nombre").value;
-  const responsable = document.getElementById("responsable").value;
-  const telefono = document.getElementById("telefono").value;
+  const nombre =
+  document.getElementById("nombre").value;
+
+  const responsable =
+  document.getElementById("responsable").value;
+
+  const telefono =
+  document.getElementById("telefono").value;
+
 
   if(!nombre || !responsable || !telefono){
+
     alert("Completa todos los campos");
     return;
+
   }
 
-  await fetch(`${API}/contratistas`, {
 
-    method:'POST',
+  // SI ESTA EDITANDO
+  if(editandoId){
 
-    headers:{
-      'Content-Type':'application/json'
-    },
+    await fetch(`${API}/contratistas/${editandoId}`,{
 
-    body: JSON.stringify({
-      nombre,
-      responsable,
-      telefono
-    })
+      method:'PUT',
 
-  });
+      headers:{
+        'Content-Type':'application/json'
+      },
+
+      body: JSON.stringify({
+        nombre,
+        responsable,
+        telefono
+      })
+
+    });
+
+    editandoId = null;
+
+  }
+
+
+  // NUEVO REGISTRO
+  else{
+
+    await fetch(`${API}/contratistas`, {
+
+      method:'POST',
+
+      headers:{
+        'Content-Type':'application/json'
+      },
+
+      body: JSON.stringify({
+        nombre,
+        responsable,
+        telefono
+      })
+
+    });
+
+  }
 
   limpiar();
   cargar();
+
 }
+
+
+
+// cargar datos para editar
+function editar(id,nombre,responsable,telefono){
+
+  editandoId = id;
+
+  document.getElementById("nombre").value =
+  nombre;
+
+  document.getElementById("responsable").value =
+  responsable;
+
+  document.getElementById("telefono").value =
+  telefono;
+
+}
+
 
 
 // eliminar
@@ -109,14 +170,18 @@ async function eliminar(id){
 }
 
 
+
 // limpiar formulario
 function limpiar(){
 
   document.getElementById("nombre").value = "";
+
   document.getElementById("responsable").value = "";
+
   document.getElementById("telefono").value = "";
 
 }
+
 
 
 // cargar tabla
@@ -129,16 +194,22 @@ async function cargar(){
   let html = '';
 
   if(data.length === 0){
+
     html = `
       <tr>
-        <td colspan="4">No hay contratistas</td>
+        <td colspan="4">
+        No hay contratistas
+        </td>
       </tr>
     `;
+
   }
+
 
   data.forEach(c => {
 
     html += `
+
       <tr>
 
         <td>${c.nombre}</td>
@@ -149,7 +220,21 @@ async function cargar(){
 
         <td>
 
-          <button class="btn-eliminar"
+          <button
+          onclick="editar(
+          ${c.id},
+          '${c.nombre}',
+          '${c.responsable}',
+          '${c.telefono}'
+          )">
+
+          ✏️
+
+          </button>
+
+
+          <button
+          class="btn-eliminar"
           onclick="eliminar(${c.id})">
 
           ❌
@@ -159,7 +244,9 @@ async function cargar(){
         </td>
 
       </tr>
+
     `;
+
   });
 
   document.getElementById("tabla").innerHTML = html;
