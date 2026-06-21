@@ -417,7 +417,7 @@ app.get('/asistencia', async (req, res) => {
 
       asistencia.id,
 
-      TO_CHAR(asistencia.fecha, 'DD/MM/YYYY') AS fecha,
+      TO_CHAR(asistencia.fecha, 'YYYY-MM-DD') AS fecha
 
       asistencia.estado,
       asistencia.observacion,
