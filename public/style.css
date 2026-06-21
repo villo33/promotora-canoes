@@ -1,103 +1,91 @@
 body{
   margin:0;
   font-family: Arial, sans-serif;
-  background: linear-gradient(135deg,#1e1e2f,#007BFF);
+  background: linear-gradient(135deg,#e0eafc,#cfdef3);
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
 
-.container{
-  width:80%;
-  margin:auto;
-  margin-top:60px;
-  background:white;
-  padding:30px;
-  border-radius:15px;
-  box-shadow:0 10px 30px rgba(0,0,0,.3);
-}
-
-h1,h2{
-  text-align:center;
-  color:#1e1e2f;
-}
-
-.menu{
+/* panel central */
+.wrapper{
+  width:100%;
   display:flex;
   justify-content:center;
-  flex-wrap:wrap;
+  padding:20px;
+}
+
+.panel{
+  width:90%;
+  max-width:900px;
+  background:white;
+  padding:40px;
+  border-radius:20px;
+  box-shadow:0 15px 40px rgba(0,0,0,0.15);
+  text-align:center;
+}
+
+/* títulos */
+h1{
+  margin:0;
+  font-size:28px;
+  color:#1e2a44;
+}
+
+h2{
+  margin-top:10px;
+  font-size:18px;
+  color:#6c7a89;
+}
+
+/* menú */
+.menu{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(180px,1fr));
   gap:20px;
   margin-top:40px;
 }
 
+/* cards modernas */
 .card{
-  width:220px;
-  padding:30px;
-  background:#f8f9fa;
-  border-radius:12px;
-  text-align:center;
+  background: #f7f9fc;
+  border-radius:16px;
+  padding:25px;
   cursor:pointer;
-  transition:.3s;
-  border:2px solid #ddd;
+  transition:0.3s;
+  border:1px solid #e4e9f2;
+  box-shadow:0 5px 15px rgba(0,0,0,0.05);
 }
 
 .card:hover{
-  transform:scale(1.05);
+  transform:translateY(-5px);
+  background:#ffffff;
+  box-shadow:0 10px 25px rgba(0,0,0,0.12);
 }
 
-input, select{
-  width:200px;
-  padding:10px;
-  margin:5px;
-  border-radius:8px;
-  border:1px solid #ccc;
+/* texto dentro cards */
+.card h3{
+  margin:0;
+  color:#1e2a44;
 }
 
+.card p{
+  color:#6c7a89;
+  font-size:14px;
+}
+
+/* botones (los de otras pantallas no se rompen) */
 button{
   padding:10px 15px;
   border:none;
-  border-radius:6px;
+  border-radius:8px;
   cursor:pointer;
   color:white;
   margin:4px;
 }
 
-.btn-guardar{
-  background:#007BFF;
-}
-
-.btn-eliminar{
-  background:#dc3545;
-}
-
-.btn-inicio{
-  background:#28a745;
-}
-
-table{
-  width:100%;
-  margin-top:20px;
-  border-collapse:collapse;
-}
-
-th{
-  background:#007BFF;
-  color:white;
-}
-
-td,th{
-  padding:10px;
-  border:1px solid #ccc;
-  text-align:center;
-}
-
-.top-bar{
-  position:absolute;
-  top:20px;
-  left:20px;
-}
-
-.form{
-  display:flex;
-  flex-wrap:wrap;
-  justify-content:center;
-  gap:10px;
-  margin-top:20px;
-}
+/* colores más suaves */
+.btn-guardar{ background:#4a90e2; }
+.btn-eliminar{ background:#e74c3c; }
+.btn-inicio{ background:#2ecc71; }

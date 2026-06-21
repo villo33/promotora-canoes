@@ -1,76 +1,44 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-
-<meta charset="UTF-8">
-<title>Promotora Canoes</title>
-<link rel="stylesheet" href="style.css">
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0b1220">
-
-</head>
-
 <body>
 
-<div class="container">
+<div class="wrapper">
 
-<h1>🏗 PROMOTORA CANOES</h1>
+  <div class="panel">
 
-<h2>Control Personal de Obra</h2>
+    <h1>🏗 PROMOTORA CANOES</h1>
+    <h2>Control Personal de Obra</h2>
 
-<div class="menu">
+    <div class="menu">
 
-<div class="card" onclick="ir('contratistas.html')">
-<h3>📁 Contratistas</h3>
-<p>Registrar empresas contratistas</p>
-</div>
+      <div class="card" onclick="ir('contratistas.html')">
+        <h3>📁 Contratistas</h3>
+        <p>Registrar empresas contratistas</p>
+      </div>
 
-<div class="card" onclick="ir('trabajadores.html')">
-<h3>👷 Trabajadores</h3>
-<p>Registrar personal</p>
-</div>
+      <div class="card" onclick="ir('trabajadores.html')">
+        <h3>👷 Trabajadores</h3>
+        <p>Registrar personal</p>
+      </div>
 
-<div class="card" onclick="ir('historial.html')">
-<h3>📊 Historial</h3>
-<p>Ver registros anteriores</p>
-</div>
+      <div class="card" onclick="ir('historial.html')">
+        <h3>📊 Historial</h3>
+        <p>Ver registros anteriores</p>
+      </div>
 
-<div class="card" onclick="ir('planilla.html')">
-  <h3>📋 Planilla Diario</h3>
-  <p>Asistencia rápida por contratista</p>
-</div>
+      <div class="card" onclick="ir('planilla.html')">
+        <h3>📋 Planilla Diario</h3>
+        <p>Asistencia rápida por contratista</p>
+      </div>
 
-</div>
+    </div>
+
+  </div>
 
 </div>
 
 <script>
-
 function ir(pagina){
   window.location.href = pagina;
 }
-
 </script>
 
 </body>
-</html>
-
-
-</div>
-
-</div>
-
-<script>
-
-function ir(pagina){
-  window.location.href = pagina;
-}
-
-</script>
-<script>
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js');
-}
-</script>
-</body>
-</html>  
