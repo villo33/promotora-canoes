@@ -163,84 +163,118 @@ app.delete('/trabajadores/:id', async (req, res) => {
 
 
 // ===================================================
-// INGRESOS
+// ASISTENCIA
 // ===================================================
 
-// ver ingresos
-app.get('/ingresos', async (req, res) => {
+
+// obtener trabajadores por contratista
+app.get('/trabajadores/:contratista_id', async (req, res) => {
+
+  try {
+
+    const result = await db.query(
+
+      `SELECT * FROM trabajadores
+       WHERE contratista_id = $1
+       ORDER BY nombre ASC`,
+
+      [req.params.contratista_id]
+
+    );
+
+    res.json(result.rows);
+
+  } catch (err) {
+
+    console.error(err);
+    res.status(500).send(err.message);
+
+  }
+
+});
+
+
+
+// guardar asistencia masiva
+app.post('/asistencia', async (req, res) => {
+
+  const lista = req.body;
+
+  const fecha = new Date()
+  .toISOString()
+  .split('T')[0];
+
+  try {
+
+    for (const item of lista) {
+
+      await db.query(
+
+        `INSERT INTO asistencia
+        (trabajador_id,fecha,estado)
+        VALUES($1,$2,$3)`,
+
+        [
+          item.trabajador_id,
+          fecha,
+          item.estado
+        ]
+
+      );
+
+    }
+
+    res.send('Asistencia guardada correctamente');
+
+  } catch (err) {
+
+    console.error(err);
+    res.status(500).send(err.message);
+
+  }
+
+});
+
+
+
+// ver historial asistencia
+app.get('/asistencia', async (req, res) => {
+
   try {
 
     const result = await db.query(`
+
       SELECT
 
-      ingresos.*,
+      asistencia.*,
 
       trabajadores.nombre,
       trabajadores.cedula,
+      trabajadores.cargo,
 
       contratistas.nombre AS contratista
 
-      FROM ingresos
+      FROM asistencia
 
       JOIN trabajadores
-      ON ingresos.trabajador_id = trabajadores.id
+      ON asistencia.trabajador_id = trabajadores.id
 
       JOIN contratistas
       ON trabajadores.contratista_id = contratistas.id
 
-      ORDER BY ingresos.id DESC
+      ORDER BY asistencia.id DESC
+
     `);
 
     res.json(result.rows);
 
   } catch (err) {
+
     console.error(err);
     res.status(500).send(err.message);
+
   }
-});
 
-
-// registrar ingreso
-app.post('/ingresos', async (req, res) => {
-
-  const { trabajador_id } = req.body;
-
-  const fecha = new Date().toISOString().split('T')[0];
-
-  const hora = new Date().toLocaleTimeString('es-CO');
-
-  try {
-
-    await db.query(
-      `INSERT INTO ingresos
-      (trabajador_id,fecha,hora)
-      VALUES($1,$2,$3)`,
-      [trabajador_id, fecha, hora]
-    );
-
-    res.send('Ingreso registrado');
-
-  } catch (err) {
-    console.error(err);
-    res.status(500).send(err.message);
-  }
-});
-
-// eliminar ingreso
-app.delete('/ingresos/:id', async (req, res) => {
-  try {
-
-    await db.query(
-      'DELETE FROM ingresos WHERE id=$1',
-      [req.params.id]
-    );
-
-    res.send('Eliminado');
-
-  } catch (err) {
-    console.error(err);
-    res.status(500).send(err.message);
-  }
 });
 
 

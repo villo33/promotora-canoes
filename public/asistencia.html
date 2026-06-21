@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Asistencia Obra</title>
+<link rel="stylesheet" href="style.css">
+
+<style>
+.tabla-check{
+  width:100%;
+  border-collapse: collapse;
+  margin-top:20px;
+}
+
+.tabla-check th,
+.tabla-check td{
+  border:1px solid #ccc;
+  padding:10px;
+  text-align:center;
+}
+
+select{
+  padding:10px;
+  width:250px;
+  border-radius:8px;
+}
+
+.check{
+  transform:scale(1.4);
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="top-bar">
+<button class="btn-inicio" onclick="inicio()">🏠 Inicio</button>
+</div>
+
+<div class="container">
+
+<h2>📋 Control Diario de Asistencia</h2>
+
+<div class="form">
+
+<select id="contratista" onchange="cargarTrabajadores()">
+<option value="">Seleccionar contratista</option>
+</select>
+
+<button class="btn-guardar" onclick="guardarAsistencia()">
+Guardar Asistencia
+</button>
+
+</div>
+
+
+<table class="tabla-check">
+
+<thead>
+
+<tr>
+
+<th>Presente</th>
+<th>Nombre</th>
+<th>Cédula</th>
+<th>Cargo</th>
+
+</tr>
+
+</thead>
+
+<tbody id="tabla"></tbody>
+
+</table>
+
+</div>
+
+
+<script>
+
+const API = window.location.origin;
+
+
+// volver
+function inicio(){
+  window.location.href="/";
+}
+
+
+// cargar contratistas
+async function cargarContratistas(){
+
+  const res = await fetch(`${API}/contratistas`);
+  const data = await res.json();
+
+  let html = `<option value="">Seleccionar contratista</option>`;
+
+  data.forEach(c=>{
+
+    html += `
+      <option value="${c.id}">
+        ${c.nombre}
+      </option>
+    `;
+
+  });
+
+  document.getElementById("contratista").innerHTML = html;
+}
+
+
+// cargar trabajadores por contratista
+async function cargarTrabajadores(){
+
+  const id = document.getElementById("contratista").value;
+
+  if(!id){
+    document.getElementById("tabla").innerHTML="";
+    return;
+  }
+
+  const res = await fetch(`${API}/trabajadores/${id}`);
+
+  const data = await res.json();
+
+  let html='';
+
+  data.forEach(t=>{
+
+    html += `
+
+    <tr>
+
+      <td>
+
+      <input
+      class="check"
+      type="checkbox"
+      value="${t.id}"
+      data-id="${t.id}">
+
+      </td>
+
+      <td>${t.nombre}</td>
+
+      <td>${t.cedula}</td>
+
+      <td>${t.cargo}</td>
+
+    </tr>
+
+    `;
+
+  });
+
+  document.getElementById("tabla").innerHTML = html;
+}
+
+
+// guardar asistencia
+async function guardarAsistencia(){
+
+  const checks = document.querySelectorAll(".check");
+
+  let lista = [];
+
+  checks.forEach(c=>{
+
+    lista.push({
+
+      trabajador_id: c.dataset.id,
+
+      estado: c.checked ? "presente" : "ausente"
+
+    });
+
+  });
+
+  if(lista.length===0){
+    alert("No hay trabajadores");
+    return;
+  }
+
+  const res = await fetch(`${API}/asistencia`,{
+
+    method:"POST",
+
+    headers:{
+      "Content-Type":"application/json"
+    },
+
+    body: JSON.stringify(lista)
+
+  });
+
+  const texto = await res.text();
+
+  alert(texto);
+
+}
+
+
+cargarContratistas();
+
+</script>
+
+</body>
+</html>
