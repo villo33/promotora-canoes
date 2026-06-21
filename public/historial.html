@@ -15,30 +15,11 @@ select,input{
   border:1px solid #ccc;
 }
 
-.estado-presente{
-  color:green;
-  font-weight:bold;
-}
-
-.estado-ausente{
-  color:red;
-  font-weight:bold;
-}
-
-.estado-permiso{
-  color:orange;
-  font-weight:bold;
-}
-
-.estado-incapacidad{
-  color:purple;
-  font-weight:bold;
-}
-
-.estado-vacaciones{
-  color:blue;
-  font-weight:bold;
-}
+.estado-presente{ color:green; font-weight:bold; }
+.estado-ausente{ color:red; font-weight:bold; }
+.estado-permiso{ color:orange; font-weight:bold; }
+.estado-incapacidad{ color:purple; font-weight:bold; }
+.estado-vacaciones{ color:blue; font-weight:bold; }
 
 </style>
 
@@ -67,7 +48,6 @@ select,input{
 <table>
 
 <thead>
-
 <tr>
 <th>Fecha</th>
 <th>Contratista</th>
@@ -77,7 +57,6 @@ select,input{
 <th>Estado</th>
 <th>Observación</th>
 </tr>
-
 </thead>
 
 <tbody id="tabla"></tbody>
@@ -92,17 +71,19 @@ select,input{
 const API = window.location.origin;
 let datosGlobal = [];
 
-
 // volver
 function inicio(){
   window.location.href="/";
 }
 
-
-// formatear fecha bonita
+// formatear fecha segura
 function formatearFecha(fechaDB){
 
+  if(!fechaDB) return "-";
+
   const fecha = new Date(fechaDB);
+
+  if(isNaN(fecha)) return fechaDB;
 
   const dia = String(fecha.getDate()).padStart(2,'0');
   const mes = String(fecha.getMonth() + 1).padStart(2,'0');
@@ -111,18 +92,13 @@ function formatearFecha(fechaDB){
   return `${dia}/${mes}/${anio}`;
 }
 
-
 // cargar contratistas
 async function cargarContratistas(){
 
   const res = await fetch(`${API}/contratistas`);
   const data = await res.json();
 
-  let html = `
-    <option value="">
-      Todos los contratistas
-    </option>
-  `;
+  let html = `<option value="">Todos los contratistas</option>`;
 
   data.forEach(c => {
 
@@ -137,115 +113,86 @@ async function cargarContratistas(){
   document.getElementById("contratista").innerHTML = html;
 }
 
-
-
 // cargar historial
 async function cargar(){
 
-  const res = await fetch(`${API}/asistencia`);
-  const data = await res.json();
+  try{
 
-  datosGlobal = data;
+    const res = await fetch(`${API}/asistencia`);
+    const data = await res.json();
 
-  renderTabla(data);
+    datosGlobal = data;
 
+    renderTabla(data);
+
+  }catch(err){
+    console.log("Error cargando asistencia:", err);
+  }
 }
-
-
 
 // filtrar
 function filtrar(){
 
-  const contratista =
-  document.getElementById("contratista").value;
-
-  const fecha =
-  document.getElementById("fecha").value;
+  const contratista = document.getElementById("contratista").value;
+  const fecha = document.getElementById("fecha").value;
 
   let filtrado = datosGlobal;
 
-
-  // filtrar contratista
   if(contratista){
-
     filtrado = filtrado.filter(d =>
       d.contratista === contratista
     );
-
   }
 
-
-  // filtrar fecha
   if(fecha){
-
     filtrado = filtrado.filter(d =>
-      d.fecha.substring(0,10) === fecha
+      d.fecha === fecha
     );
-
   }
 
   renderTabla(filtrado);
-
 }
-
-
 
 // pintar tabla
 function renderTabla(data){
 
   let html = '';
 
-  if(data.length === 0){
+  if(!data || data.length === 0){
 
     html = `
       <tr>
-        <td colspan="7">
-          No hay registros
-        </td>
+        <td colspan="7">No hay registros</td>
       </tr>
     `;
 
+    document.getElementById("tabla").innerHTML = html;
+    return;
   }
-
 
   data.forEach(r => {
 
     html += `
-
 <tr>
 
-<td>${r.fecha}</td>
+<td>${formatearFecha(r.fecha)}</td>
+<td>${r.contratista || '-'}</td>
+<td>${r.nombre || '-'}</td>
+<td>${r.cedula || '-'}</td>
+<td>${r.cargo || '-'}</td>
 
-<td>${r.contratista}</td>
-
-<td>${r.nombre}</td>
-
-<td>${r.cedula}</td>
-
-<td>${r.cargo}</td>
-
-<td class="${
-  r.estado === 'presente'
-  ? 'estado-presente'
-  : 'estado-ausente'
-}">
-${r.estado}
+<td class="estado-${r.estado}">
+${r.estado || '-'}
 </td>
 
-<td>
-${r.observacion || '-'}
-</td>
+<td>${r.observacion || '-'}</td>
 
 </tr>
 `;
-
   });
 
-
   document.getElementById("tabla").innerHTML = html;
-
 }
-
 
 cargarContratistas();
 cargar();
