@@ -86,10 +86,7 @@ button{
 .btn-guardar{ background:#4a90e2; }
 .btn-eliminar{ background:#e74c3c; }
 .btn-inicio{ background:#2ecc71; }
-.btn-pdf{
-  background:#007BFF;
-  color:white;
-}
+
 
 .container{
   width:90%;
@@ -107,10 +104,9 @@ button{
   cursor:pointer;
   font-weight:bold;
   display:inline-block;
+  transition:0.2s;
 }
 
-.top-bar,
-.container{
-  position:relative;
-  z-index:1;
+.btn-pdf:hover{
+  background:#0056b3;
 }
