@@ -15,30 +15,11 @@ select,input{
   border:1px solid #ccc;
 }
 
-.estado-presente{
-  color:green;
-  font-weight:bold;
-}
-
-.estado-ausente{
-  color:red;
-  font-weight:bold;
-}
-
-.estado-permiso{
-  color:orange;
-  font-weight:bold;
-}
-
-.estado-incapacidad{
-  color:purple;
-  font-weight:bold;
-}
-
-.estado-vacaciones{
-  color:blue;
-  font-weight:bold;
-}
+.estado-presente{ color:green; font-weight:bold; }
+.estado-ausente{ color:red; font-weight:bold; }
+.estado-permiso{ color:orange; font-weight:bold; }
+.estado-incapacidad{ color:purple; font-weight:bold; }
+.estado-vacaciones{ color:blue; font-weight:bold; }
 
 /* linea separadora */
 .separador-fecha td{
@@ -97,25 +78,24 @@ select,input{
 const API = window.location.origin;
 let datosGlobal = [];
 
-
 // volver
 function inicio(){
   window.location.href="/";
 }
-
 
 // formatear fecha segura
 function formatearFecha(fechaDB){
 
   if(!fechaDB) return "-";
 
-  const soloFecha = fechaDB.substring(0,10);
+  const soloFecha = fechaDB.split("T")[0]; // seguro
 
   const partes = soloFecha.split("-");
 
+  if(partes.length < 3) return fechaDB;
+
   return `${partes[2]}/${partes[1]}/${partes[0]}`;
 }
-
 
 // cargar contratistas
 async function cargarContratistas(){
@@ -142,8 +122,6 @@ async function cargarContratistas(){
   document.getElementById("contratista").innerHTML = html;
 }
 
-
-
 // cargar historial
 async function cargar(){
 
@@ -153,10 +131,7 @@ async function cargar(){
   datosGlobal = data;
 
   renderTabla(data);
-
 }
-
-
 
 // filtrar
 function filtrar(){
@@ -169,30 +144,20 @@ function filtrar(){
 
   let filtrado = datosGlobal;
 
-
   if(contratista){
-
     filtrado = filtrado.filter(d =>
       d.contratista === contratista
     );
-
   }
 
-
   if(fecha){
-
     filtrado = filtrado.filter(d =>
-      d.fecha.substring(0,10) === fecha
+      d.fecha === fecha   // 🔥 CORREGIDO
     );
-
   }
 
   renderTabla(filtrado);
-
 }
-
-
-
 
 // pintar tabla
 function renderTabla(data){
@@ -213,15 +178,12 @@ function renderTabla(data){
     return;
   }
 
-
   let fechaAnterior = "";
 
   data.forEach(r => {
 
-    let fechaActual = r.fecha.substring(0,10);
+    let fechaActual = r.fecha; // 🔥 CORREGIDO
 
-
-    // si cambia fecha → agregar linea separadora
     let clase = "";
 
     if(fechaAnterior && fechaActual !== fechaAnterior){
@@ -230,40 +192,25 @@ function renderTabla(data){
 
     fechaAnterior = fechaActual;
 
-
     html += `
-
 <tr class="${clase}">
 
 <td>${formatearFecha(r.fecha)}</td>
-
 <td>${r.contratista}</td>
-
 <td>${r.nombre}</td>
-
 <td>${r.cedula}</td>
-
 <td>${r.cargo}</td>
-
 <td class="estado-${r.estado}">
 ${r.estado}
 </td>
-
-<td>
-${r.observacion || '-'}
-</td>
+<td>${r.observacion || '-'}</td>
 
 </tr>
-
 `;
-
   });
 
-
   document.getElementById("tabla").innerHTML = html;
-
 }
-
 
 cargarContratistas();
 cargar();
