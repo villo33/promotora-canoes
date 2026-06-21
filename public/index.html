@@ -5,6 +5,8 @@
 <meta charset="UTF-8">
 <title>Promotora Canoes</title>
 <link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0b1220">
 
 </head>
 
@@ -65,6 +67,10 @@ function ir(pagina){
 }
 
 </script>
-
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js');
+}
+</script>
 </body>
 </html>  
