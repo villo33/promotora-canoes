@@ -40,6 +40,14 @@ select,input{
   font-weight:bold;
 }
 
+.fecha-separador{
+  background:#1e293b;
+  color:white;
+  font-weight:bold;
+  text-align:center;
+  font-size:18px;
+}
+
 </style>
 
 </head>
@@ -99,7 +107,7 @@ function inicio(){
 }
 
 
-// formatear fecha bonita
+// formato fecha bonito
 function formatearFecha(fechaDB){
 
   const fecha = new Date(fechaDB);
@@ -165,7 +173,6 @@ function filtrar(){
   let filtrado = datosGlobal;
 
 
-  // filtrar contratista
   if(contratista){
 
     filtrado = filtrado.filter(d =>
@@ -175,7 +182,6 @@ function filtrar(){
   }
 
 
-  // filtrar fecha
   if(fecha){
 
     filtrado = filtrado.filter(d =>
@@ -190,7 +196,8 @@ function filtrar(){
 
 
 
-// pintar tabla
+
+// pintar tabla agrupando por fecha
 function renderTabla(data){
 
   let html = '';
@@ -205,16 +212,45 @@ function renderTabla(data){
       </tr>
     `;
 
+    document.getElementById("tabla").innerHTML = html;
+    return;
   }
 
 
+  let fechaAnterior = "";
+
+
   data.forEach(r => {
+
+    let fechaActual = r.fecha.substring(0,10);
+
+
+    // SI CAMBIA FECHA → crear separador
+    if(fechaActual !== fechaAnterior){
+
+      html += `
+
+      <tr class="fecha-separador">
+        <td colspan="7">
+
+        📅 ${formatearFecha(fechaActual)}
+
+        ━━━━━━━━━━━━━━━━━━━━━
+
+        </td>
+      </tr>
+
+      `;
+
+      fechaAnterior = fechaActual;
+    }
+
 
     html += `
 
 <tr>
 
-<td>${r.fecha}</td>
+<td>${formatearFecha(r.fecha)}</td>
 
 <td>${r.contratista}</td>
 
@@ -224,11 +260,7 @@ function renderTabla(data){
 
 <td>${r.cargo}</td>
 
-<td class="${
-  r.estado === 'presente'
-  ? 'estado-presente'
-  : 'estado-ausente'
-}">
+<td class="estado-${r.estado}">
 ${r.estado}
 </td>
 
@@ -237,6 +269,7 @@ ${r.observacion || '-'}
 </td>
 
 </tr>
+
 `;
 
   });
