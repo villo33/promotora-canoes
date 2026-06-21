@@ -3,9 +3,6 @@ body{
   font-family: Arial, sans-serif;
   background: linear-gradient(135deg,#e0eafc,#cfdef3);
   min-height:100vh;
-  display:flex;
-  align-items:center;
-  justify-content:center;
 }
 
 /* panel central */
@@ -89,3 +86,7 @@ button{
 .btn-guardar{ background:#4a90e2; }
 .btn-eliminar{ background:#e74c3c; }
 .btn-inicio{ background:#2ecc71; }
+.btn-pdf{
+  background:#007BFF;
+  color:white;
+}
