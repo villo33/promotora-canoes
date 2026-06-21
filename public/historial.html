@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+
+<meta charset="UTF-8">
+<title>Historial Asistencia</title>
+<link rel="stylesheet" href="style.css">
+
+<style>
+
+select{
+  padding:10px;
+  width:250px;
+  border-radius:8px;
+}
+
+.estado-presente{
+  color:green;
+  font-weight:bold;
+}
+
+.estado-ausente{
+  color:red;
+  font-weight:bold;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="top-bar">
+  <button class="btn-inicio" onclick="inicio()">🏠 Inicio</button>
+</div>
+
+<div class="container">
+
+<h2>📊 Historial de Asistencia</h2>
+
+<div class="form">
+
+<select id="contratista" onchange="filtrar()">
+<option value="">Todos los contratistas</option>
+</select>
+
+<input type="date" id="fecha" onchange="filtrar()">
+
+</div>
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Fecha</th>
+<th>Contratista</th>
+<th>Trabajador</th>
+<th>Cédula</th>
+<th>Cargo</th>
+<th>Estado</th>
+
+</tr>
+
+</thead>
+
+<tbody id="tabla"></tbody>
+
+</table>
+
+</div>
+
+
+<script>
+
+const API = window.location.origin;
+let datosGlobal = [];
+
+
+// volver
+function inicio(){
+  window.location.href="/";
+}
+
+
+// cargar contratistas
+async function cargarContratistas(){
+
+  const res = await fetch(`${API}/contratistas`);
+  const data = await res.json();
+
+  let html = `
+    <option value="">
+      Todos los contratistas
+    </option>
+  `;
+
+  data.forEach(c=>{
+
+    html += `
+      <option value="${c.nombre}">
+        ${c.nombre}
+      </option>
+    `;
+
+  });
+
+  document.getElementById("contratista").innerHTML = html;
+}
+
+
+
+// cargar historial completo
+async function cargar(){
+
+  const res = await fetch(`${API}/asistencia`);
+
+  const data = await res.json();
+
+  datosGlobal = data;
+
+  renderTabla(data);
+
+}
+
+
+
+// filtrar
+function filtrar(){
+
+  const contratista =
+  document.getElementById("contratista").value;
+
+  const fecha =
+  document.getElementById("fecha").value;
+
+  let filtrado = datosGlobal;
+
+  if(contratista){
+
+    filtrado = filtrado.filter(d =>
+      d.contratista === contratista
+    );
+
+  }
+
+  if(fecha){
+
+    filtrado = filtrado.filter(d =>
+      d.fecha === fecha
+    );
+
+  }
+
+  renderTabla(filtrado);
+
+}
+
+
+
+// renderizar tabla
+function renderTabla(data){
+
+  let html = '';
+
+  if(data.length === 0){
+
+    html = `
+      <tr>
+        <td colspan="6">
+          No hay registros
+        </td>
+      </tr>
+    `;
+
+  }
+
+  data.forEach(r=>{
+
+    html += `
+
+    <tr>
+
+      <td>${r.fecha}</td>
+
+      <td>${r.contratista}</td>
+
+      <td>${r.nombre}</td>
+
+      <td>${r.cedula}</td>
+
+      <td>${r.cargo}</td>
+
+      <td class="${
+        r.estado === 'presente'
+        ? 'estado-presente'
+        : 'estado-ausente'
+      }">
+
+      ${r.estado}
+
+      </td>
+
+    </tr>
+
+    `;
+
+  });
+
+  document.getElementById("tabla").innerHTML = html;
+
+}
+
+
+cargarContratistas();
+cargar();
+
+</script>
+
+</body>
+</html>
