@@ -8,10 +8,11 @@
 
 <style>
 
-select{
+select,input{
   padding:10px;
   width:250px;
   border-radius:8px;
+  border:1px solid #ccc;
 }
 
 .estado-presente{
@@ -22,6 +23,26 @@ select{
 .estado-ausente{
   color:red;
   font-weight:bold;
+}
+
+.estado-permiso{
+  color:orange;
+  font-weight:bold;
+}
+
+.estado-incapacidad{
+  color:purple;
+  font-weight:bold;
+}
+
+.estado-vacaciones{
+  color:blue;
+  font-weight:bold;
+}
+
+/* linea separadora */
+.separador-fecha td{
+  border-top:4px solid #d1d5db;
 }
 
 </style>
@@ -53,9 +74,13 @@ select{
 <thead>
 
 <tr>
-
-
-
+<th>Fecha</th>
+<th>Contratista</th>
+<th>Trabajador</th>
+<th>Cédula</th>
+<th>Cargo</th>
+<th>Estado</th>
+<th>Observación</th>
 </tr>
 
 </thead>
@@ -79,6 +104,19 @@ function inicio(){
 }
 
 
+// formatear fecha segura
+function formatearFecha(fechaDB){
+
+  if(!fechaDB) return "-";
+
+  const soloFecha = fechaDB.substring(0,10);
+
+  const partes = soloFecha.split("-");
+
+  return `${partes[2]}/${partes[1]}/${partes[0]}`;
+}
+
+
 // cargar contratistas
 async function cargarContratistas(){
 
@@ -91,7 +129,7 @@ async function cargarContratistas(){
     </option>
   `;
 
-  data.forEach(c=>{
+  data.forEach(c => {
 
     html += `
       <option value="${c.nombre}">
@@ -106,11 +144,10 @@ async function cargarContratistas(){
 
 
 
-// cargar historial completo
+// cargar historial
 async function cargar(){
 
   const res = await fetch(`${API}/asistencia`);
-
   const data = await res.json();
 
   datosGlobal = data;
@@ -132,6 +169,7 @@ function filtrar(){
 
   let filtrado = datosGlobal;
 
+
   if(contratista){
 
     filtrado = filtrado.filter(d =>
@@ -140,10 +178,11 @@ function filtrar(){
 
   }
 
+
   if(fecha){
 
     filtrado = filtrado.filter(d =>
-      d.fecha === fecha
+      d.fecha.substring(0,10) === fecha
     );
 
   }
@@ -154,7 +193,8 @@ function filtrar(){
 
 
 
-// renderizar tabla
+
+// pintar tabla
 function renderTabla(data){
 
   let html = '';
@@ -163,45 +203,62 @@ function renderTabla(data){
 
     html = `
       <tr>
-        <td colspan="6">
+        <td colspan="7">
           No hay registros
         </td>
       </tr>
     `;
 
+    document.getElementById("tabla").innerHTML = html;
+    return;
   }
 
-  data.forEach(r=>{
+
+  let fechaAnterior = "";
+
+  data.forEach(r => {
+
+    let fechaActual = r.fecha.substring(0,10);
+
+
+    // si cambia fecha → agregar linea separadora
+    let clase = "";
+
+    if(fechaAnterior && fechaActual !== fechaAnterior){
+      clase = "separador-fecha";
+    }
+
+    fechaAnterior = fechaActual;
+
 
     html += `
 
-    <tr>
+<tr class="${clase}">
 
-      <td>${r.fecha}</td>
+<td>${formatearFecha(r.fecha)}</td>
 
-      <td>${r.contratista}</td>
+<td>${r.contratista}</td>
 
-      <td>${r.nombre}</td>
+<td>${r.nombre}</td>
 
-      <td>${r.cedula}</td>
+<td>${r.cedula}</td>
 
-      <td>${r.cargo}</td>
+<td>${r.cargo}</td>
 
-      <td class="${
-        r.estado === 'presente'
-        ? 'estado-presente'
-        : 'estado-ausente'
-      }">
+<td class="estado-${r.estado}">
+${r.estado}
+</td>
 
-      ${r.estado}
+<td>
+${r.observacion || '-'}
+</td>
 
-      </td>
+</tr>
 
-    </tr>
-
-    `;
+`;
 
   });
+
 
   document.getElementById("tabla").innerHTML = html;
 
