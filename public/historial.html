@@ -58,6 +58,7 @@ select,input{
 <div class="container">
 
 <h2>📊 Historial de Asistencia</h2>
+<button onclick="generarPDF()">📄 Descargar PDF</button>
 
 <div class="form">
 
@@ -92,17 +93,18 @@ select,input{
 </div>
 
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+
 <script>
 
 const API = window.location.origin;
 let datosGlobal = [];
 
-
 // volver
 function inicio(){
   window.location.href="/";
 }
-
 
 // formatear fecha segura
 function formatearFecha(fechaDB){
@@ -110,12 +112,10 @@ function formatearFecha(fechaDB){
   if(!fechaDB) return "-";
 
   const soloFecha = fechaDB.substring(0,10);
-
   const partes = soloFecha.split("-");
 
   return `${partes[2]}/${partes[1]}/${partes[0]}`;
 }
-
 
 // cargar contratistas
 async function cargarContratistas(){
@@ -123,26 +123,14 @@ async function cargarContratistas(){
   const res = await fetch(`${API}/contratistas`);
   const data = await res.json();
 
-  let html = `
-    <option value="">
-      Todos los contratistas
-    </option>
-  `;
+  let html = `<option value="">Todos los contratistas</option>`;
 
   data.forEach(c => {
-
-    html += `
-      <option value="${c.nombre}">
-        ${c.nombre}
-      </option>
-    `;
-
+    html += `<option value="${c.nombre}">${c.nombre}</option>`;
   });
 
   document.getElementById("contratista").innerHTML = html;
 }
-
-
 
 // cargar historial
 async function cargar(){
@@ -151,124 +139,101 @@ async function cargar(){
   const data = await res.json();
 
   datosGlobal = data;
-
   renderTabla(data);
-
 }
-
-
 
 // filtrar
 function filtrar(){
 
-  const contratista =
-  document.getElementById("contratista").value;
-
-  const fecha =
-  document.getElementById("fecha").value;
+  const contratista = document.getElementById("contratista").value;
+  const fecha = document.getElementById("fecha").value;
 
   let filtrado = datosGlobal;
 
-
   if(contratista){
-
-    filtrado = filtrado.filter(d =>
-      d.contratista === contratista
-    );
-
+    filtrado = filtrado.filter(d => d.contratista === contratista);
   }
 
-
   if(fecha){
-
-    filtrado = filtrado.filter(d =>
-      d.fecha.substring(0,10) === fecha
-    );
-
+    filtrado = filtrado.filter(d => d.fecha.substring(0,10) === fecha);
   }
 
   renderTabla(filtrado);
-
 }
 
-
-
-
-// pintar tabla
+// tabla
 function renderTabla(data){
 
   let html = '';
 
-  if(data.length === 0){
-
-    html = `
-      <tr>
-        <td colspan="7">
-          No hay registros
-        </td>
-      </tr>
-    `;
-
+  if(!data || data.length === 0){
+    html = `<tr><td colspan="7">No hay registros</td></tr>`;
     document.getElementById("tabla").innerHTML = html;
     return;
   }
 
-
-  let fechaAnterior = "";
-
   data.forEach(r => {
 
-    let fechaActual = r.fecha.substring(0,10);
-
-
-    // si cambia fecha → agregar linea separadora
-    let clase = "";
-
-    if(fechaAnterior && fechaActual !== fechaAnterior){
-      clase = "separador-fecha";
-    }
-
-    fechaAnterior = fechaActual;
-
-
     html += `
-
-<tr class="${clase}">
+<tr>
 
 <td>${formatearFecha(r.fecha)}</td>
-
 <td>${r.contratista}</td>
-
 <td>${r.nombre}</td>
-
 <td>${r.cedula}</td>
-
 <td>${r.cargo}</td>
 
 <td class="estado-${r.estado}">
 ${r.estado}
 </td>
 
-<td>
-${r.observacion || '-'}
-</td>
+<td>${r.observacion || '-'}</td>
 
 </tr>
-
 `;
-
   });
 
-
   document.getElementById("tabla").innerHTML = html;
-
 }
 
+// PDF
+function generarPDF(){
 
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  doc.setFontSize(14);
+  doc.text("PROMOTORA CANOES", 14, 15);
+  doc.setFontSize(11);
+  doc.text("Historial de Asistencia", 14, 22);
+
+  const filas = datosGlobal.map(r => [
+    formatearFecha(r.fecha),
+    r.contratista,
+    r.nombre,
+    r.cedula,
+    r.cargo,
+    r.estado,
+    r.observacion || '-'
+  ]);
+
+  doc.autoTable({
+    head: [[
+      "Fecha","Contratista","Trabajador",
+      "Cédula","Cargo","Estado","Observación"
+    ]],
+    body: filas,
+    startY: 30,
+    styles: { fontSize: 8 }
+  });
+
+  doc.save("historial-asistencia.pdf");
+}
+
+// iniciar
 cargarContratistas();
 cargar();
 
 </script>
-
 </body>
 </html>
