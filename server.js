@@ -406,7 +406,6 @@ app.post('/control-diario', async (req, res) => {
 });
 
 
-// historial asistencia
 app.get('/asistencia', async (req, res) => {
 
   try {
@@ -414,30 +413,26 @@ app.get('/asistencia', async (req, res) => {
     const result = await db.query(`
 
       SELECT
+        asistencia.id,
+        asistencia.fecha,
+        asistencia.estado,
+        asistencia.observacion,
 
-      asistencia.id,
+        trabajadores.nombre,
+        trabajadores.cedula,
+        trabajadores.cargo,
 
-      TO_CHAR(asistencia.fecha, 'YYYY-MM-DD') AS fecha
-
-      asistencia.estado,
-      asistencia.observacion,
-
-      trabajadores.nombre,
-      trabajadores.cedula,
-      trabajadores.cargo,
-
-      contratistas.nombre AS contratista
+        contratistas.nombre AS contratista
 
       FROM asistencia
 
-      JOIN trabajadores
-      ON asistencia.trabajador_id = trabajadores.id
+      LEFT JOIN trabajadores
+        ON asistencia.trabajador_id = trabajadores.id
 
-      JOIN contratistas
-      ON trabajadores.contratista_id = contratistas.id
+      LEFT JOIN contratistas
+        ON trabajadores.contratista_id = contratistas.id
 
-      ORDER BY asistencia.fecha DESC,
-               asistencia.id DESC
+      ORDER BY asistencia.id DESC
 
     `);
 
@@ -445,13 +440,12 @@ app.get('/asistencia', async (req, res) => {
 
   } catch (err) {
 
-    console.error(err);
+    console.error("ERROR EN /asistencia:", err);
     res.status(500).send(err.message);
 
   }
 
 });
-
 
 
 
