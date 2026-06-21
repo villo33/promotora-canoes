@@ -21,7 +21,6 @@ select,input{
 .estado-incapacidad{ color:purple; font-weight:bold; }
 .estado-vacaciones{ color:blue; font-weight:bold; }
 
-/* linea separadora */
 .separador-fecha td{
   border-top:4px solid #d1d5db;
 }
@@ -88,11 +87,11 @@ function formatearFecha(fechaDB){
 
   if(!fechaDB) return "-";
 
-  const soloFecha = fechaDB.split("T")[0]; // seguro
+  const soloFecha = fechaDB.split("T")[0];
 
   const partes = soloFecha.split("-");
 
-  if(partes.length < 3) return fechaDB;
+  if(partes.length !== 3) return fechaDB;
 
   return `${partes[2]}/${partes[1]}/${partes[0]}`;
 }
@@ -152,7 +151,7 @@ function filtrar(){
 
   if(fecha){
     filtrado = filtrado.filter(d =>
-      d.fecha === fecha   // 🔥 CORREGIDO
+      d.fecha === fecha
     );
   }
 
@@ -182,7 +181,7 @@ function renderTabla(data){
 
   data.forEach(r => {
 
-    let fechaActual = r.fecha; // 🔥 CORREGIDO
+    let fechaActual = r.fecha;
 
     let clase = "";
 
