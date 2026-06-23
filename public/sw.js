@@ -1,6 +1,10 @@
+const CACHE_NAME = "canoes-v2";
+
 self.addEventListener("install", (event) => {
+  self.skipWaiting(); // 🔥 fuerza actualización inmediata
+
   event.waitUntil(
-    caches.open("canoes-cache").then((cache) => {
+    caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll([
         "/",
         "/index.html",
@@ -13,6 +17,22 @@ self.addEventListener("install", (event) => {
       ]);
     })
   );
+});
+
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    caches.keys().then((keys) => {
+      return Promise.all(
+        keys.map((key) => {
+          if (key !== CACHE_NAME) {
+            return caches.delete(key); // 🧹 borra cache viejo
+          }
+        })
+      );
+    })
+  );
+
+  self.clients.claim(); // 🔥 toma control inmediato
 });
 
 self.addEventListener("fetch", (event) => {
