@@ -1,3 +1,7 @@
+/* =========================
+   BASE GENERAL
+========================= */
+
 body{
   margin:0;
   font-family: Arial, sans-serif;
@@ -5,7 +9,10 @@ body{
   min-height:100vh;
 }
 
-/* panel central */
+/* =========================
+   INDEX / DASHBOARD
+========================= */
+
 .wrapper{
   width:100%;
   display:flex;
@@ -23,7 +30,6 @@ body{
   text-align:center;
 }
 
-/* títulos */
 h1{
   margin:0;
   font-size:28px;
@@ -36,7 +42,6 @@ h2{
   color:#6c7a89;
 }
 
-/* menú */
 .menu{
   display:grid;
   grid-template-columns:repeat(auto-fit, minmax(180px,1fr));
@@ -44,9 +49,8 @@ h2{
   margin-top:40px;
 }
 
-/* cards modernas */
 .card{
-  background: #f7f9fc;
+  background:#f7f9fc;
   border-radius:16px;
   padding:25px;
   cursor:pointer;
@@ -61,7 +65,6 @@ h2{
   box-shadow:0 10px 25px rgba(0,0,0,0.12);
 }
 
-/* texto dentro cards */
 .card h3{
   margin:0;
   color:#1e2a44;
@@ -72,7 +75,10 @@ h2{
   font-size:14px;
 }
 
-/* botones (los de otras pantallas no se rompen) */
+/* =========================
+   BOTONES GLOBALES
+========================= */
+
 button{
   padding:10px 15px;
   border:none;
@@ -80,13 +86,21 @@ button{
   cursor:pointer;
   color:white;
   margin:4px;
+  font-size:14px;
 }
 
-/* colores más suaves */
 .btn-guardar{ background:#4a90e2; }
 .btn-eliminar{ background:#e74c3c; }
 .btn-inicio{ background:#2ecc71; }
+.btn-pdf{ background:#007BFF; }
 
+.btn-pdf:hover{
+  background:#0056b3;
+}
+
+/* =========================
+   CRUD (CONTRATISTAS / TRABAJADORES)
+========================= */
 
 .container{
   width:90%;
@@ -95,18 +109,63 @@ button{
   padding:20px;
 }
 
-.btn-pdf{
-  background:#007BFF;
+/* barra superior */
+.top-bar{
+  background:#1e2a44;
+  padding:10px;
   color:white;
-  padding:10px 15px;
-  border-radius:8px;
-  border:none;
-  cursor:pointer;
-  font-weight:bold;
-  display:inline-block;
-  transition:0.2s;
+  display:flex;
+  align-items:center;
 }
 
-.btn-pdf:hover{
-  background:#0056b3;
+/* formulario */
+.form{
+  margin:15px 0;
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+}
+
+/* inputs y selects */
+input, select{
+  padding:10px;
+  border-radius:8px;
+  border:1px solid #ccc;
+  outline:none;
+}
+
+/* tabla general */
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:20px;
+  background:white;
+  border-radius:10px;
+  overflow:hidden;
+  box-shadow:0 5px 15px rgba(0,0,0,0.05);
+}
+
+th{
+  background:#1e2a44;
+  color:white;
+  padding:10px;
+}
+
+td{
+  padding:10px;
+  border-bottom:1px solid #eee;
+  text-align:center;
+}
+
+/* =========================
+   PLANILLA / ESTADOS
+========================= */
+
+.estado{
+  width:150px;
+}
+
+.obs,
+.observacion{
+  width:220px;
 }
