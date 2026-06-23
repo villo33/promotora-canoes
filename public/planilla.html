@@ -3,11 +3,11 @@
 <head>
 
 <meta charset="UTF-8">
-<title>Planilla Diaria</title>
+<title>Planilla Diario</title>
+
 <link rel="stylesheet" href="/style.css">
 
 <style>
-
 select, input{
   padding:10px;
   border-radius:8px;
@@ -32,15 +32,6 @@ td, th{
   text-align:center;
 }
 
-.btn-guardar{
-  background:#28a745;
-  color:white;
-  padding:10px 20px;
-  border:none;
-  cursor:pointer;
-  border-radius:8px;
-}
-
 .estado{
   width:150px;
 }
@@ -49,6 +40,26 @@ td, th{
   width:220px;
 }
 
+/* logo */
+.logo{
+  width:120px;
+  margin-bottom:10px;
+}
+
+/* botones */
+.btn-pdf{
+  background:#ff9800;
+  color:white;
+  padding:10px 20px;
+  border:none;
+  cursor:pointer;
+  border-radius:8px;
+  margin-left:10px;
+}
+
+.btn-pdf:hover{
+  background:#e68900;
+}
 </style>
 
 </head>
@@ -60,6 +71,11 @@ td, th{
 </div>
 
 <div class="container">
+
+<!-- LOGO -->
+<div style="text-align:center;">
+  <img src="/logo.png" class="logo" alt="logo">
+</div>
 
 <h2>📋 Planilla Diario de Personal</h2>
 
@@ -95,6 +111,10 @@ td, th{
 💾 Guardar Planilla
 </button>
 
+<button class="btn-pdf" onclick="descargarPDF()">
+📄 Descargar PDF
+</button>
+
 </div>
 
 <script>
@@ -102,51 +122,34 @@ td, th{
 const API = window.location.origin;
 let trabajadores = [];
 
-
-// volver inicio
+// inicio
 function inicio(){
   window.location.href="/";
 }
 
-
-// cargar contratistas
+// contratistas
 async function cargarContratistas(){
 
   const res = await fetch(`${API}/contratistas`);
   const data = await res.json();
 
-  let html = `
-  <option value="">
-  Seleccionar contratista
-  </option>
-  `;
+  let html = `<option value="">Seleccionar contratista</option>`;
 
   data.forEach(c => {
-
-    html += `
-    <option value="${c.id}">
-      ${c.nombre}
-    </option>
-    `;
-
+    html += `<option value="${c.id}">${c.nombre}</option>`;
   });
 
   document.getElementById("contratista").innerHTML = html;
 }
 
-
-// cargar trabajadores del contratista
+// trabajadores
 async function cargarTrabajadores(){
 
-  const contratista =
-  document.getElementById("contratista").value;
+  const contratista = document.getElementById("contratista").value;
 
   if(!contratista) return;
 
-  const res = await fetch(
-    `${API}/trabajadores/${contratista}`
-  );
-
+  const res = await fetch(`${API}/trabajadores/${contratista}`);
   const data = await res.json();
 
   trabajadores = data;
@@ -156,76 +159,37 @@ async function cargarTrabajadores(){
   data.forEach(t => {
 
     html += `
-
     <tr>
-
       <td>${t.nombre}</td>
-
       <td>${t.cedula}</td>
-
       <td>${t.cargo}</td>
-
       <td>
-
-      <select
-      class="estado"
-      id="estado_${t.id}">
-
-        <option value="presente">
-          Presente
-        </option>
-
-        <option value="ausente">
-          Ausente
-        </option>
-
-        <option value="incapacidad">
-          Incapacidad
-        </option>
-
-        <option value="permiso">
-          Permiso
-        </option>
-
-        <option value="vacaciones">
-          Vacaciones
-        </option>
-
-      </select>
-
+        <select class="estado" id="estado_${t.id}">
+          <option value="presente">Presente</option>
+          <option value="ausente">Ausente</option>
+          <option value="incapacidad">Incapacidad</option>
+          <option value="permiso">Permiso</option>
+          <option value="vacaciones">Vacaciones</option>
+        </select>
       </td>
-
       <td>
-
-      <input
-      class="obs"
-      id="obs_${t.id}"
-      placeholder="Observación">
-
+        <input class="obs" id="obs_${t.id}" placeholder="Observación">
       </td>
-
     </tr>
-
     `;
-
   });
 
   document.getElementById("tabla").innerHTML = html;
 }
 
-
-
-// guardar planilla
+// guardar
 async function guardar(){
 
-  const fecha =
-  document.getElementById("fecha").value;
+  const fecha = document.getElementById("fecha").value;
 
   if(!fecha){
-
     alert("Selecciona una fecha");
     return;
-
   }
 
   let lista = [];
@@ -233,49 +197,105 @@ async function guardar(){
   trabajadores.forEach(t => {
 
     lista.push({
-
       trabajador_id: t.id,
-
       fecha: fecha,
-
-      estado:
-      document.getElementById(
-      `estado_${t.id}`
-      ).value,
-
-      observacion:
-      document.getElementById(
-      `obs_${t.id}`
-      ).value
-
+      estado: document.getElementById(`estado_${t.id}`).value,
+      observacion: document.getElementById(`obs_${t.id}`).value
     });
 
   });
 
-
-  const res = await fetch(
-    `${API}/control-diario`,
-    {
-
-      method:'POST',
-
-      headers:{
-        'Content-Type':'application/json'
-      },
-
-      body: JSON.stringify(lista)
-
-    }
-  );
-
+  const res = await fetch(`${API}/control-diario`, {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(lista)
+  });
 
   const msg = await res.text();
-
   alert(msg);
-
 }
 
+// PDF por fecha
+async function descargarPDF(){
 
+  const fecha = document.getElementById("fecha").value;
+
+  if(!fecha){
+    alert("Selecciona una fecha");
+    return;
+  }
+
+  const res = await fetch(`${API}/asistencia`);
+  const data = await res.json();
+
+  const filtrado = data.filter(r => r.fecha === fecha);
+
+  if(filtrado.length === 0){
+    alert("No hay registros para esta fecha");
+    return;
+  }
+
+  let ventana = window.open("", "_blank");
+
+  ventana.document.write(`
+    <html>
+    <head>
+      <title>Reporte ${fecha}</title>
+      <style>
+        body{font-family:Arial;padding:20px;}
+        table{width:100%;border-collapse:collapse;}
+        th,td{border:1px solid #ccc;padding:8px;text-align:center;}
+        th{background:#1e2a44;color:white;}
+      </style>
+    </head>
+    <body>
+
+    <div style="text-align:center;">
+      <img src="/logo.png" style="width:120px;">
+      <h2>📋 Reporte Planilla - ${fecha}</h2>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Trabajador</th>
+          <th>Cédula</th>
+          <th>Cargo</th>
+          <th>Estado</th>
+          <th>Observación</th>
+          <th>Contratista</th>
+        </tr>
+      </thead>
+      <tbody>
+  `);
+
+  filtrado.forEach(r => {
+    ventana.document.write(`
+      <tr>
+        <td>${r.nombre}</td>
+        <td>${r.cedula}</td>
+        <td>${r.cargo}</td>
+        <td>${r.estado}</td>
+        <td>${r.observacion || ''}</td>
+        <td>${r.contratista}</td>
+      </tr>
+    `);
+  });
+
+  ventana.document.write(`
+      </tbody>
+    </table>
+
+    <script>
+      window.print();
+    <\/script>
+
+    </body>
+    </html>
+  `);
+
+  ventana.document.close();
+}
 
 cargarContratistas();
 
