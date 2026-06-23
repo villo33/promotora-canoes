@@ -165,13 +165,18 @@ function renderTabla(data){
   document.getElementById("tabla").innerHTML = html;
 }
 
-// ================= PDF CON LOGO =================
 async function generarPDF(){
+
+  const fecha = document.getElementById("fecha").value;
+
+  if(!fecha){
+    alert("Selecciona una fecha");
+    return;
+  }
 
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
 
-  // 🔥 LOGO
   const img = new Image();
   img.src = "/logo.png";
 
@@ -183,9 +188,19 @@ async function generarPDF(){
     doc.text("PROMOTORA CANOES", 40, 15);
 
     doc.setFontSize(11);
-    doc.text("Historial de Asistencia", 40, 22);
+    doc.text(`Historial de Asistencia - ${fecha}`, 40, 22);
 
-    const filas = datosGlobal.map(r=>[
+    // 🔥 FILTRO SOLO POR FECHA
+    const filtrado = datosGlobal.filter(r =>
+      r.fecha.substring(0,10) === fecha
+    );
+
+    if(filtrado.length === 0){
+      alert("No hay datos para esta fecha");
+      return;
+    }
+
+    const filas = filtrado.map(r=>[
       formatearFecha(r.fecha),
       r.contratista,
       r.nombre,
@@ -196,17 +211,18 @@ async function generarPDF(){
     ]);
 
     doc.autoTable({
-      head:[["Fecha","Contratista","Trabajador","Cédula","Cargo","Estado","Observación"]],
+      head:[[
+        "Fecha","Contratista","Trabajador",
+        "Cédula","Cargo","Estado","Observación"
+      ]],
       body:filas,
       startY:35,
       styles:{ fontSize:8 }
     });
 
-    doc.save("historial-asistencia.pdf");
+    doc.save(`asistencia-${fecha}.pdf`);
   };
-
 }
-
 // init
 cargarContratistas();
 cargar();
