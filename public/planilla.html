@@ -32,12 +32,23 @@ td, th{
   text-align:center;
 }
 
+/* estado */
 .estado{
   width:150px;
 }
 
+/* OBSERVACIÓN MEJORADA */
 .obs{
   width:220px;
+  min-height:45px;
+  padding:8px;
+  border-radius:8px;
+  border:1px solid #ccc;
+
+  resize:none;           /* evita que lo agranden */
+  overflow-wrap:break-word;
+  white-space:pre-wrap;  /* respeta saltos */
+  font-family: Arial;
 }
 
 /* logo */
@@ -47,19 +58,15 @@ td, th{
 }
 
 /* botones */
-.btn-pdf{
-  background:#ff9800;
+.btn-guardar{
+  background:#28a745;
   color:white;
   padding:10px 20px;
   border:none;
   cursor:pointer;
   border-radius:8px;
-  margin-left:10px;
 }
 
-.btn-pdf:hover{
-  background:#e68900;
-}
 </style>
 
 </head>
@@ -111,10 +118,6 @@ td, th{
 💾 Guardar Planilla
 </button>
 
-<button class="btn-pdf" onclick="descargarPDF()">
-📄 Descargar PDF
-</button>
-
 </div>
 
 <script>
@@ -163,6 +166,7 @@ async function cargarTrabajadores(){
       <td>${t.nombre}</td>
       <td>${t.cedula}</td>
       <td>${t.cargo}</td>
+
       <td>
         <select class="estado" id="estado_${t.id}">
           <option value="presente">Presente</option>
@@ -172,9 +176,11 @@ async function cargarTrabajadores(){
           <option value="vacaciones">Vacaciones</option>
         </select>
       </td>
+
       <td>
-        <input class="obs" id="obs_${t.id}" placeholder="Observación">
+        <textarea class="obs" id="obs_${t.id}" placeholder="Observación"></textarea>
       </td>
+
     </tr>
     `;
   });
@@ -213,88 +219,6 @@ async function guardar(){
 
   const msg = await res.text();
   alert(msg);
-}
-
-// PDF por fecha
-async function descargarPDF(){
-
-  const fecha = document.getElementById("fecha").value;
-
-  if(!fecha){
-    alert("Selecciona una fecha");
-    return;
-  }
-
-  const res = await fetch(`${API}/asistencia`);
-  const data = await res.json();
-
-  const filtrado = data.filter(r => r.fecha === fecha);
-
-  if(filtrado.length === 0){
-    alert("No hay registros para esta fecha");
-    return;
-  }
-
-  let ventana = window.open("", "_blank");
-
-  ventana.document.write(`
-    <html>
-    <head>
-      <title>Reporte ${fecha}</title>
-      <style>
-        body{font-family:Arial;padding:20px;}
-        table{width:100%;border-collapse:collapse;}
-        th,td{border:1px solid #ccc;padding:8px;text-align:center;}
-        th{background:#1e2a44;color:white;}
-      </style>
-    </head>
-    <body>
-
-    <div style="text-align:center;">
-      <img src="/logo.png" style="width:120px;">
-      <h2>📋 Reporte Planilla - ${fecha}</h2>
-    </div>
-
-    <table>
-      <thead>
-        <tr>
-          <th>Trabajador</th>
-          <th>Cédula</th>
-          <th>Cargo</th>
-          <th>Estado</th>
-          <th>Observación</th>
-          <th>Contratista</th>
-        </tr>
-      </thead>
-      <tbody>
-  `);
-
-  filtrado.forEach(r => {
-    ventana.document.write(`
-      <tr>
-        <td>${r.nombre}</td>
-        <td>${r.cedula}</td>
-        <td>${r.cargo}</td>
-        <td>${r.estado}</td>
-        <td>${r.observacion || ''}</td>
-        <td>${r.contratista}</td>
-      </tr>
-    `);
-  });
-
-  ventana.document.write(`
-      </tbody>
-    </table>
-
-    <script>
-      window.print();
-    <\/script>
-
-    </body>
-    </html>
-  `);
-
-  ventana.document.close();
 }
 
 cargarContratistas();
